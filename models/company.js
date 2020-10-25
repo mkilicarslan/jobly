@@ -15,7 +15,13 @@ class Company {
 			throw { message: `There is no company with the handle '${handle}`, status: 404 };
 		}
 
-		return dbRes.rows[0];
+		const jobsQuery = "SELECT * FROM job WHERE company_handle = $1 ORDER BY date_posted DESC";
+		const jobsRes = await db.query(jobsQuery, [handle]);
+
+		const company = dbRes.rows[0];
+		company.jobs = jobsRes.rows;
+
+		return company;
 	}
 
 	/** Return array of book data:
@@ -24,8 +30,14 @@ class Company {
 	 *
 	 */
 	static async getAll() {
-		const booksRes = await db.query(`SELECT * FROM company ORDER BY name`);
-		return booksRes.rows;
+		const companiesRes = await db.query(`SELECT * FROM company ORDER BY name`);
+		return companiesRes.rows;
+		// const jobsRes = await db.query(`SELECT * FROM job`);
+
+		// return companiesRes.rows.map((company) => ({
+		// 	...company,
+		// 	jobs: jobsRes.rows.map((j) => j.company_handle === c.handle),
+		// }));
 	}
 
 	/** create company in database from data, return company data:

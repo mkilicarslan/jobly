@@ -8,6 +8,9 @@ const Company = require("../../models/company");
 let company;
 
 beforeEach(async function () {
+	await db.query("DELETE FROM job");
+	await db.query("DELETE FROM company");
+
 	company = await Company.create({
 		name: "My Company",
 		description: "First description",
@@ -30,11 +33,10 @@ describe("GET /company", function () {
 /** GET /companies/[handle] - return data about one company: `{company: companyData}` */
 describe("GET /company/:handle", function () {
 	test("Gets a single company", async function () {
-		console.log(company);
 		const resp = await request(app).get(`/company/${company.handle}`);
 
 		expect(resp.statusCode).toBe(200);
-		expect(resp.body).toEqual({ company });
+		expect(resp.body).toEqual({ company: { ...company, jobs: [] } });
 	});
 
 	test("Responds with 404 if can't find company", async function () {
@@ -96,6 +98,7 @@ describe("DELETE /companies/:handle", function () {
 // end
 
 afterEach(async function () {
+	await db.query("DELETE FROM job");
 	await db.query("DELETE FROM company");
 });
 afterAll(async function () {

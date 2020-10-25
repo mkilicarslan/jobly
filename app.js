@@ -15,8 +15,10 @@ app.use(cors());
 
 /** routes */
 const companyRoutes = require("./routes/company");
+const jobRoutes = require("./routes/job");
 
 app.use("/company", companyRoutes);
+app.use("/jobs", jobRoutes);
 
 // add logging system
 app.use(morgan("tiny"));
