@@ -4,6 +4,8 @@ const router = new express.Router();
 const User = require("../models/user");
 const userCreate = require("../schemas/userCreate.json");
 const userUpdate = require("../schemas/userUpdate.json");
+const { ensureCorrectUser } = require("../middleware/auth");
+const generateJWT = require("../helpers/generateJWT");
 
 /** GET / => {users: [user, ...]}  */
 router.get("/", async function (req, res, next) {
@@ -38,14 +40,15 @@ router.post("/", async function (req, res, next) {
 		}
 
 		const user = await User.create(req.body);
-		return res.status(201).json({ user });
+		const _token = generateJWT(user);
+		return res.status(201).json({ _token });
 	} catch (err) {
 		return next(err);
 	}
 });
 
 /** PATCH /[username]   userData => {user: updatedUser}  */
-router.patch("/:username", async function (req, res, next) {
+router.patch("/:username", ensureCorrectUser, async function (req, res, next) {
 	try {
 		const validationRes = jsonschema.validate(req.body, userUpdate);
 		if (!validationRes.valid) {
@@ -65,7 +68,7 @@ router.patch("/:username", async function (req, res, next) {
 });
 
 /** DELETE /[username]   => {message: "User deleted"} */
-router.delete("/:username", async function (req, res, next) {
+router.delete("/:username", ensureCorrectUser, async function (req, res, next) {
 	try {
 		await User.delete(req.params.username);
 		return res.json({ message: "User deleted" });

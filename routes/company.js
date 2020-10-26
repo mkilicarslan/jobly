@@ -4,9 +4,10 @@ const router = new express.Router();
 const Company = require("../models/company");
 const companyCreate = require("../schemas/companyCreate.json");
 const companyUpdate = require("../schemas/companyUpdate.json");
+const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 
 /** GET / => {companies: [company, ...]}  */
-router.get("/", async function (req, res, next) {
+router.get("/", ensureLoggedIn, async function (req, res, next) {
 	try {
 		const companies = await Company.getAll(req.query);
 		return res.json({ companies });
@@ -16,7 +17,7 @@ router.get("/", async function (req, res, next) {
 });
 
 /** GET /[id]  => {company: company} */
-router.get("/:handle", async function (req, res, next) {
+router.get("/:handle", ensureLoggedIn, async function (req, res, next) {
 	try {
 		const company = await Company.get(req.params.handle);
 		return res.json({ company });
@@ -26,7 +27,7 @@ router.get("/:handle", async function (req, res, next) {
 });
 
 /** POST /   companyData => {company: newCompany}  */
-router.post("/", async function (req, res, next) {
+router.post("/", ensureAdmin, async function (req, res, next) {
 	try {
 		const result = jsonschema.validate(req.body, companyCreate);
 		if (!result.valid) {
@@ -45,7 +46,7 @@ router.post("/", async function (req, res, next) {
 });
 
 /** PATCH /[id]   companyData => {company: updatedCompany}  */
-router.patch("/:handle", async function (req, res, next) {
+router.patch("/:handle", ensureAdmin, async function (req, res, next) {
 	try {
 		const validationRes = jsonschema.validate(req.body, companyUpdate);
 		if (!validationRes.valid) {
@@ -65,7 +66,7 @@ router.patch("/:handle", async function (req, res, next) {
 });
 
 /** DELETE /[id]   => {message: "Company deleted"} */
-router.delete("/:handle", async function (req, res, next) {
+router.delete("/:handle", ensureAdmin, async function (req, res, next) {
 	try {
 		await Company.delete(req.params.handle);
 		return res.json({ message: "Deleted" });

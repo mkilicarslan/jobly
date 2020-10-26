@@ -3,6 +3,7 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const ExpressError = require("./helpers/expressError");
+const { authenticateJWT } = require("./middleware/auth");
 
 const app = express();
 
@@ -13,12 +14,19 @@ app.use(express.urlencoded({ extended: true }));
 // allow connections to all routes from any browser
 app.use(cors());
 
+// authenticate user if there is a valid token on request
+app.use(authenticateJWT);
+
 /** routes */
 const companyRoutes = require("./routes/company");
 const jobRoutes = require("./routes/job");
+const userRoutes = require("./routes/user");
+const authRoutes = require("./routes/auth");
 
 app.use("/company", companyRoutes);
 app.use("/jobs", jobRoutes);
+app.use("/users", userRoutes);
+app.use("/auth", authRoutes);
 
 // add logging system
 app.use(morgan("tiny"));

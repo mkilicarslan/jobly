@@ -2,7 +2,7 @@ const slug = require("slug");
 const db = require("../db");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
 
-/** Collection of related methods for books. */
+/** Collection of related methods for companies. */
 class Company {
 	/** given an handle, return company data with that handle:
 	 *
@@ -24,7 +24,7 @@ class Company {
 		return company;
 	}
 
-	/** Return array of book data:
+	/** Return array of company data:
 	 *
 	 * => [ companyData, ... ]
 	 *

@@ -3,7 +3,7 @@
 require("dotenv").config();
 
 const SECRET_KEY = process.env.SECRET_KEY || "test";
-
+const BCRYPT_WORK_FACTOR = 12;
 const PORT = +process.env.PORT || 3000;
 
 // database is:
@@ -21,6 +21,7 @@ if (process.env.NODE_ENV === "test") {
 }
 
 module.exports = {
+	BCRYPT_WORK_FACTOR,
 	SECRET_KEY,
 	PORT,
 	DB_URI,

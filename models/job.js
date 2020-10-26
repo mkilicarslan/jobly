@@ -1,7 +1,7 @@
 const db = require("../db");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
 
-/** Collection of related methods for books. */
+/** Collection of related methods for jobs. */
 class Job {
 	/** given an id, return job data with that id:
 	 *
@@ -17,14 +17,14 @@ class Job {
 		return dbRes.rows[0];
 	}
 
-	/** Return array of book data:
+	/** Return array of job data:
 	 *
 	 * => [ jobData, ... ]
 	 *
 	 */
 	static async getAll({ search, min_salary, min_equity }) {
-		const booksRes = await db.query(`SELECT * FROM job ORDER BY title`);
-		return booksRes.rows;
+		const jobsRes = await db.query(`SELECT * FROM job ORDER BY title`);
+		return jobsRes.rows;
 	}
 
 	/** create job in database from data, return job data:

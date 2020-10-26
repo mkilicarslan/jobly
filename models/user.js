@@ -1,5 +1,7 @@
+const bcrypt = require("bcrypt");
 const db = require("../db");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
+const { BCRYPT_WORK_FACTOR } = require("../config");
 
 /** Collection of related methods for user. */
 class User {
@@ -35,6 +37,7 @@ class User {
 	 *
 	 * */
 	static async create(data) {
+		const hashedPassword = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
 		const dbQuery = `INSERT INTO users (
             username,
             password,
@@ -47,7 +50,7 @@ class User {
          RETURNING *`;
 		const result = await db.query(dbQuery, [
 			data.username,
-			data.password,
+			hashedPassword,
 			data.first_name,
 			data.last_name,
 			data.email,
@@ -87,6 +90,13 @@ class User {
 		if (dbRes.rows.length === 0) {
 			throw { message: `There is no user with a username '${username}`, status: 404 };
 		}
+	}
+
+	/** Authenticate: is this username/password valid? Returns boolean. */
+	static async authenticate(username, password) {
+		const result = await db.query("SELECT password FROM users WHERE username = $1", [username]);
+		const user = result.rows[0];
+		return user && (await bcrypt.compare(password, user.password)) && user;
 	}
 }
 
