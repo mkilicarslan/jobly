@@ -1,0 +1,89 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "password": "secretpass",
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "johndoe@jd.com",
+            "photo_url": "https://www.photo-url.com",
+            "is_admin": false
+        }
+    ],
+    "anyOf": [
+        {"required":["password"]},
+        {"required":["first_name"]},
+        {"required":["last_name"]},
+        {"required":["email"]},
+        {"required":["photo_url"]},
+        {"required":["is_admin"]}
+    ],
+    "properties": {
+        "password": {
+            "$id": "#/properties/password",
+            "type": "string",
+            "title": "The password schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "secretpass"
+            ]
+        },
+        "first_name": {
+            "$id": "#/properties/first_name",
+            "type": "string",
+            "title": "The first_name schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "John"
+            ]
+        },
+        "last_name": {
+            "$id": "#/properties/last_name",
+            "type": "string",
+            "title": "The last_name schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "Doe"
+            ]
+        },
+        "email": {
+            "$id": "#/properties/email",
+            "type": "string",
+            "title": "The email schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "johndoe@jd.com"
+            ]
+        },
+        "photo_url": {
+            "$id": "#/properties/photo_url",
+            "type": "string",
+            "title": "The photo_url schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "https://www.photo-url.com"
+            ]
+        },
+        "is_admin": {
+            "$id": "#/properties/is_admin",
+            "type": "boolean",
+            "title": "The is_admin schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": false,
+            "examples": [
+                false
+            ]
+        }
+    },
+    "additionalProperties": true
+}
