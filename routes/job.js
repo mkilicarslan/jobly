@@ -9,7 +9,14 @@ const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 /** GET / => {jobs: [job, ...]}  */
 router.get("/", ensureLoggedIn, async function (req, res, next) {
 	try {
-		const jobs = await Job.getAll(req.query);
+		const { search, min_salary, min_equity } = req.query;
+		if (min_salary < 0 || min_equity < 0) {
+			return next({
+				status: 400,
+				message: "min_salary and min_equity values must be greater than or equal to zero",
+			});
+		}
+		const jobs = await Job.getAll({ search, min_salary, min_equity });
 		return res.json({ jobs });
 	} catch (err) {
 		return next(err);
@@ -51,7 +58,6 @@ router.patch("/:id", ensureAdmin, async function (req, res, next) {
 		const validationRes = jsonschema.validate(req.body, jobUpdate);
 		if (!validationRes.valid) {
 			const listOfErrors = validationRes.errors.map((error) => error.stack);
-			console.log(listOfErrors);
 			return next({
 				status: 404,
 				errors: listOfErrors,

@@ -23,8 +23,33 @@ class Job {
 	 *
 	 */
 	static async getAll({ search, min_salary, min_equity }) {
-		const jobsRes = await db.query(`SELECT * FROM job ORDER BY title`);
-		return jobsRes.rows;
+		let dbQuery = "SELECT * FROM job";
+		let idx = 1;
+		const values = [];
+		if (search || min_salary || min_equity) {
+			dbQuery = dbQuery.concat(" WHERE ");
+
+			if (search) {
+				dbQuery = dbQuery.concat(`title LIKE $${idx} OR company_handle LIKE $${idx} `);
+				values.push("%" + search + "%");
+				idx++;
+			}
+			if (min_salary) {
+				dbQuery = dbQuery.concat(idx === 1 ? `salary >= $${idx} ` : `AND salary >= $${idx} `);
+				values.push(min_salary);
+				idx++;
+			}
+			if (min_equity) {
+				dbQuery = dbQuery.concat(idx === 1 ? `equity >= $${idx} ` : `AND equity <= $${idx} `);
+				values.push(min_equity);
+				idx++;
+			}
+		}
+
+		dbQuery = dbQuery.concat(" ORDER BY title");
+
+		const dbRes = await db.query(dbQuery, values);
+		return dbRes.rows;
 	}
 
 	/** create job in database from data, return job data:

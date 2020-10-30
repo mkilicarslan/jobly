@@ -53,7 +53,6 @@ router.patch("/:username", ensureCorrectUser, async function (req, res, next) {
 		const validationRes = jsonschema.validate(req.body, userUpdate);
 		if (!validationRes.valid) {
 			const listOfErrors = validationRes.errors.map((error) => error.stack);
-			console.log(listOfErrors);
 			return next({
 				status: 404,
 				errors: listOfErrors,

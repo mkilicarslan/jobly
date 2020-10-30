@@ -29,15 +29,33 @@ class Company {
 	 * => [ companyData, ... ]
 	 *
 	 */
-	static async getAll() {
-		const companiesRes = await db.query(`SELECT * FROM company ORDER BY name`);
-		return companiesRes.rows;
-		// const jobsRes = await db.query(`SELECT * FROM job`);
+	static async getAll({ search, min_employees, max_employees }) {
+		let dbQuery = "SELECT * FROM company";
+		let idx = 1;
+		const values = [];
+		if (search || min_employees || max_employees) {
+			dbQuery = dbQuery.concat(" WHERE ");
+		}
+		if (search) {
+			dbQuery = dbQuery.concat(`name LIKE $${idx} OR handle LIKE $${idx} `);
+			values.push("%" + search + "%");
+			idx++;
+		}
+		if (min_employees) {
+			dbQuery = dbQuery.concat(idx === 1 ? `num_employees >= $${idx} ` : ` AND num_employees >= $${idx} `);
+			values.push(min_employees);
+			idx++;
+		}
+		if (max_employees) {
+			dbQuery = dbQuery.concat(idx === 1 ? `num_employees <= $${idx} ` : ` AND num_employees <= $${idx} `);
+			values.push(max_employees);
+			idx++;
+		}
 
-		// return companiesRes.rows.map((company) => ({
-		// 	...company,
-		// 	jobs: jobsRes.rows.map((j) => j.company_handle === c.handle),
-		// }));
+		dbQuery = dbQuery.concat(" ORDER BY name");
+
+		const companiesRes = await db.query(dbQuery, values);
+		return companiesRes.rows;
 	}
 
 	/** create company in database from data, return company data:

@@ -9,7 +9,16 @@ const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 /** GET / => {companies: [company, ...]}  */
 router.get("/", ensureLoggedIn, async function (req, res, next) {
 	try {
-		const companies = await Company.getAll(req.query);
+		const { search, min_employees, max_employees } = req.query;
+
+		if (min_employees > max_employees) {
+			return next({
+				status: 400,
+				message: "min_employees must not be more than max_employees",
+			});
+		}
+
+		const companies = await Company.getAll({ search, min_employees, max_employees });
 		return res.json({ companies });
 	} catch (err) {
 		return next(err);
@@ -51,7 +60,6 @@ router.patch("/:handle", ensureAdmin, async function (req, res, next) {
 		const validationRes = jsonschema.validate(req.body, companyUpdate);
 		if (!validationRes.valid) {
 			const listOfErrors = validationRes.errors.map((error) => error.stack);
-			console.log(listOfErrors);
 			return next({
 				status: 404,
 				errors: listOfErrors,
